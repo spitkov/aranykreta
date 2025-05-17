@@ -6,7 +6,7 @@
   let selectedTeachers = []; 
   let maxVotes;
   $: maxVotes = data.event?.max_votes_per_code || 1;
-  $: isSubmitDisabled = (maxVotes === 1 ? selectedTeachers.length !== 1 : selectedTeachers.length !== maxVotes);
+  $: isSubmitDisabled = selectedTeachers.length === 0 || selectedTeachers.length > maxVotes;
 
   function handleSelection(event) {
     const value = event.target.value; // teacher.id as a string
@@ -22,7 +22,7 @@
         selectedTeachers = [...selectedTeachers, value];
       } else {
         event.target.checked = false; // Prevent checking more than allowed
-        alert(`Legfeljebb ${maxVotes} tanárt választhat.`); // Corrected alert message
+        alert(`Legfeljebb ${maxVotes} tanárt választhat.`);
       }
     } else {
       selectedTeachers = selectedTeachers.filter(id => id !== value);
@@ -41,9 +41,12 @@
         <p class="mt-2 text-xs text-gray-500 dark:text-gray-500">Szavazókód: {data.code}</p>
         {#if maxVotes > 1}
           <p class="mt-1 text-sm text-indigo-600 dark:text-indigo-400 font-semibold">
-            <!-- Válasszon pontosan {maxVotes} tanárt. Jelenleg kiválasztva: {selectedTeachers.length} -->
-            {maxVotes === 1 ? 'Válasszon egy tanárt' : `Válasszon ${maxVotes} tanárt.`} Jelenleg: {selectedTeachers.length}
+            Legfeljebb {maxVotes} tanárt választhat. Jelenleg kiválasztva: {selectedTeachers.length}
           </p>
+        {:else}
+            <p class="mt-1 text-sm text-indigo-600 dark:text-indigo-400 font-semibold">
+                Válasszon egy tanárt.
+            </p>
         {/if}
       </div>
 
@@ -58,7 +61,11 @@
         <div class="mb-4">
           <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Válassz tanárt</h2>
           <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            {maxVotes === 1 ? 'Kérjük, válassza ki azt a tanárt, akire szavazni szeretne.' : `Kérjük, válasszon ${maxVotes} tanárt.`}
+            {#if maxVotes === 1}
+              Kérjük, válassza ki azt a tanárt, akire szavazni szeretne.
+            {:else}
+              Kérjük, válasszon legalább egy, legfeljebb {maxVotes} tanárt.
+            {/if}
           </p>
         </div>
         
@@ -72,9 +79,9 @@
                   name="teacherId"
                   value={teacher.id} 
                   class="hidden peer"
-                  required={maxVotes === 1 && selectedTeachers.length === 0}
                   checked={selectedTeachers.includes(teacher.id.toString())}
                   on:change={handleSelection}
+                  aria-required={selectedTeachers.length === 0} 
                 />
                 <label
                   for="teacher-{teacher.id}"
