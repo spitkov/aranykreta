@@ -1,0 +1,28 @@
+{
+	"name": "vote",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-auto": "^6.0.0",
+		"@sveltejs/kit": "^2.16.0",
+		"@sveltejs/vite-plugin-svelte": "^5.0.0",
+		"@tailwindcss/forms": "^0.5.9",
+		"@tailwindcss/typography": "^0.5.15",
+		"@tailwindcss/vite": "^4.0.0",
+		"svelte": "^5.0.0",
+		"tailwindcss": "^4.0.0",
+		"vite": "^6.2.6"
+	},
+	"dependencies": {
+		"better-sqlite3": "^11.10.0",
+		"pdfkit": "^0.17.1",
+		"qrcode": "^1.5.4"
+	}
+}
