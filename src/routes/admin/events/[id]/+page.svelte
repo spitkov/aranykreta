@@ -54,6 +54,9 @@
       <a href="/admin/events/{data.event.id}/export/votes.json" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 dark:bg-teal-500 dark:hover:bg-teal-600" download>
         Szavazatok Exportálása (JSON)
       </a>
+      <a href="/admin/events/{data.event.id}/export/non-voters.xlsx" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 dark:bg-teal-500 dark:hover:bg-teal-600" rel="external" target="_blank">
+        Nem Szavazók Exportálása (XLSX)
+      </a>
       <a href="/admin/events/{data.event.id}/edit" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-slate-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-slate-600">
         Szerkesztés
       </a>
