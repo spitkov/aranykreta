@@ -67,10 +67,10 @@ export const actions = {
       });
     }
 
-    if (teacherIds.length !== maxVotes) {
+    if (teacherIds.length > maxVotes) {
       return fail(400, {
         error: true,
-        message: `Kérjük, pontosan ${maxVotes} tanárt válasszon. Ön ${teacherIds.length} tanárt választott.`,
+        message: `Legfeljebb ${maxVotes} tanárt választhat. Ön ${teacherIds.length} tanárt választott.`,
         codeValue,
         selectedTeacherIds: teacherIds
       });
