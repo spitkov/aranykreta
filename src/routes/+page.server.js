@@ -9,25 +9,53 @@ export function load() {
 export const actions = {
   checkCode: async ({ request }) => {
     const formData = await request.formData();
-    const code = formData.get('code')?.trim();
+    const rawCodeValue = formData.get('code')?.trim();
 
-    if (!code) {
+    if (!rawCodeValue) {
       return fail(400, {
         error: true,
         message: 'Kérjük, add meg a szavazókódot.',
-        codeValue: code,
+        codeValue: rawCodeValue,
       });
     }
 
-    const codeRecord = db.prepare(
+    let codeToQuery = rawCodeValue.toUpperCase(); // Convert to uppercase for consistent processing
+    let codeRecord = null;
+
+    // Attempt 1: Query with the code as is (assuming it might already have a hyphen or COLLATE NOCASE handles it)
+    // The COLLATE NOCASE on the column definition makes this query effectively case-insensitive.
+    codeRecord = db.prepare(
       'SELECT c.code, c.used, c.event_id, c.class_id FROM codes c WHERE c.code = ?'
-    ).get(code);
+    ).get(codeToQuery);
+
+    // Attempt 2: Auto-hyphenation if Attempt 1 failed and no hyphen is present in the uppercased code
+    if (!codeRecord && !codeToQuery.includes('-')) {
+      // Regex to capture typical prefix (1-2 digits, 1 letter) and 4-digit number
+      const hyphenationRegex = /^([0-9]{1,2}[A-Z])([0-9]{4})$/;
+      const match = codeToQuery.match(hyphenationRegex);
+
+      if (match) {
+        const prefix = match[1];
+        const numberPart = match[2];
+        const hyphenatedCode = `${prefix}-${numberPart}`;
+        
+        // Query with the auto-hyphenated code
+        codeRecord = db.prepare(
+          'SELECT c.code, c.used, c.event_id, c.class_id FROM codes c WHERE c.code = ?'
+        ).get(hyphenatedCode);
+        
+        // If found with hyphenation, update codeToQuery to the version that worked, for the redirect
+        if (codeRecord) {
+          codeToQuery = hyphenatedCode; 
+        }
+      }
+    }
 
     if (!codeRecord) {
       return fail(400, {
         error: true,
-        message: 'Érvénytelen szavazókód.',
-        codeValue: code,
+        message: 'Érvénytelen vagy nem található szavazókód.',
+        codeValue: rawCodeValue, // Return the original raw input on error
       });
     }
 
@@ -35,12 +63,12 @@ export const actions = {
       return fail(400, {
         error: true,
         message: 'Ez a szavazókód már fel lett használva.',
-        codeValue: code,
+        codeValue: rawCodeValue, // Return the original raw input
       });
     }
 
-    // Valid and not used, redirect to the specific code page
-    throw redirect(303, `/${codeRecord.code}`);
+    // Valid and not used, redirect to the specific code page using the version of the code that was found
+    throw redirect(303, `/${codeRecord.code}`); // Use codeRecord.code for the redirect to ensure correct casing if it matters for the URL
   },
 
   // submitVote: async ({ request }) => {
